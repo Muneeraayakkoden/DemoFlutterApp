@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/constants/icons_class.dart';
+import 'package:flutter_application_1/constants/color_class.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,8 +10,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  
-  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,12 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 100),
+            const SizedBox(height:120),
             Image.asset(
               IconClass.splashLogo,
-              height: 100,
+              width: 58,
+              height: 58,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
             const Text(
               'Hira Plus',
               style: TextStyle(
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextField(
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: 'Username',
+                      hintText: 'Role',
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.white24,
@@ -66,11 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    controller: passwordController,
-                    obscureText: true,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: 'Password',
+                      hintText: 'Username',
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.white24,
@@ -95,14 +94,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: const Text('Continue'),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   TextButton(
                     onPressed: () {
                       // Handle help
                     },
-                    child: const Text(
-                      'Need help?',
-                      style: TextStyle(color: Colors.white70),
+                    child: Text(
+                      'Need help? Contact Hira Manager',
+                      style: TextStyle(color: ColorClass.brandLightGreen.withValues(alpha: 0.8), fontSize: 12),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
