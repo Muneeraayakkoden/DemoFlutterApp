@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/routes/app_routes.dart';
 import 'package:flutter_application_1/routes/routes_names.dart';
+import 'package:flutter_application_1/constants/color_class.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,10 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Demo App',
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: ColorClass.greenDark),
-      //   useMaterial3: true,
-      // ),
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+      ),
       initialRoute: RouteNames.splash,
       routes: AppRoutes.routes,
     );
