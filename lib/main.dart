@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_application_1/routes/app_routes.dart';
-//import 'package:flutter_application_1/routes/routes_names.dart';
+import 'package:flutter_application_1/routes/app_routes.dart';
+import 'package:flutter_application_1/routes/routes_names.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,8 +18,8 @@ class MyApp extends StatelessWidget {
       //   colorScheme: ColorScheme.fromSeed(seedColor: ColorClass.greenDark),
       //   useMaterial3: true,
       // ),
-      //initialRoute: RouteNames.splash,
-      //routes: AppRoutes.routes,
+      initialRoute: RouteNames.splash,
+      routes: AppRoutes.routes,
     );
   }
 }
