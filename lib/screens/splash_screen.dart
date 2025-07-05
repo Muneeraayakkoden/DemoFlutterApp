@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/routes/routes_names.dart';
 import 'package:flutter_application_1/constants/icons_class.dart';
 import 'package:flutter_application_1/constants/textstyle_class.dart';
+import 'package:flutter_application_1/constants/color_class.dart';
+import 'package:flutter_application_1/utils/navigation_helper.dart';
+import 'package:flutter_application_1/constants/global_variables.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -44,12 +47,10 @@ class _SplashScreenState extends State<SplashScreen>
     ));
 
     _animationController.forward();  
-    _navigateToHome();
-  }
-
-  void _navigateToHome() async {
-    await Future.delayed(Duration(milliseconds: 4000), () {
-      Navigator.pushReplacementNamed(context, RouteNames.login);
+    Future.delayed(Duration(milliseconds: 4000), () {
+      if (mounted) {
+        navigateReplaceTo(context: context, route: RouteNames.login);
+      }
     });
   }
 
@@ -68,9 +69,9 @@ class _SplashScreenState extends State<SplashScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF1B3932), // top
-              Color(0xFF2D5A4F), 
-              Color(0xFF4A8F77),// bottom
+              ColorClass.brandDarkGreen, // top
+              ColorClass.middleGradient, 
+              ColorClass.bottomGradient,// bottom
             ],
           ),
         ),
@@ -128,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     SizedBox(height: 8),
                     Text(
-                      'V1.0.8',
+                      'v${GlobalVariables.appVersion}',
                       style: TextStyleClass.poppinsRegular(
                         fontSize: 12,
                         color: Colors.white,

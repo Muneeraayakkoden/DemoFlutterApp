@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/routes/app_routes.dart';
 import 'package:flutter_application_1/routes/routes_names.dart';
-import 'package:flutter_application_1/constants/color_class.dart';
 
 void main() {
   runApp(const MyApp());

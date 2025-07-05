@@ -205,4 +205,7 @@ class ColorClass {
   static const Color brandWhite = Color(0xFFFFFFFF);
   static const Color brandGreen = Color(0xFF188064);
   static const Color splashGreen = Color(0xFF12342B); // H and background
+
+  static const Color middleGradient = Color(0xFF2D5A4F);
+  static const Color bottomGradient = Color(0xFF4A8F77);
 }
