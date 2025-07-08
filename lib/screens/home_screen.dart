@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/constants/color_class.dart';
+// import 'package:lucide_icons/lucide_icons.dart';
+import 'bottom_navbar.dart'; 
+import 'user_screens/user_home.dart';
+import 'user_screens/user_notifcation.dart';
+import 'profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,23 +13,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
+
+  int _selectedIndex = 0;
+  final List<Widget> _screens = const [
+    UserHome(),
+    UserNotification(),
+    ProfileScreen(),
+  ];
+  void _onTabTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ColorClass.greenDarker, 
-        centerTitle: true,
-        title: const Text(
-          'Hira Plus',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Center(
-        child: Text('Home Screen'),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _selectedIndex,
+        onTap: _onTabTapped,
       ),
     );
   }
