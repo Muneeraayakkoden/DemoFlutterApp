@@ -5,6 +5,7 @@ import '../routes/routes_names.dart';
 import '../utils/navigation_helper.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:toastification/toastification.dart';
+import 'package:pinput/pinput.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,35 +19,75 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isPhoneEntered = false;
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-
-  // final TextEditingController _otpController = TextEditingController();
-  // final FocusNode _otpFocusNode = FocusNode();
-  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // final bool _isOtpSent = false;
-  // final bool _isOtpVerified = false;
-  // final bool _isLoading = false;
+  final TextEditingController _otpController = TextEditingController();
+  final FocusNode _otpFocusNode = FocusNode();
+  bool get _isUserRole => selectedRole == 'User';
 
   bool isValidPhoneNumber(String? value) {
     if (value == null || value.isEmpty) return false;
     return RegExp(r'^[0-9]{10}$').hasMatch(value);
   }
-
   bool isValidUsername(String? value) {
     return value != null && value.isNotEmpty && value.length >= 3; 
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void _showError(String message) {
+    toastification.show(
+      context: context,
+      title: const Text('Error'),
+      description: Text(message),
+      type: ToastificationType.error,
+      autoCloseDuration: const Duration(seconds: 3),
+    );
+  }
+    void _showSuccess(String message) {
+    toastification.show(
+      context: context,
+      title: const Text('Success'),
+      description: Text(message),
+      type: ToastificationType.success,
+      autoCloseDuration: const Duration(seconds: 3),
+    );
+  }
+
+  void _resendOtp() {
+    // OTP resend logic
+    _showSuccess('OTP resent to ${_phoneController.text}');
+  }
+
+  void _handleContinue() {
+    if (_isUserRole) {
+      if (isPhoneEntered) {
+        // OTP validation logic would go here
+        if(_otpController.text.length == 6){
+          _showSuccess('OTP validated');
+          navigateReplaceTo(context: context, route: RouteNames.home);
+        } else {
+          _showError('Please enter a valid OTP');
+        }
+      } else if (isValidPhoneNumber(_phoneController.text)) {
+        setState(() => isPhoneEntered = true);
+        _otpFocusNode.requestFocus();
+      } else {
+        _showError('Please enter a valid 10-digit phone number');
+      }
+    } else {
+      if (isValidUsername(_usernameController.text)) {
+        navigateReplaceTo(context: context, route: RouteNames.home);
+      } else {
+        _showError('Please enter a valid username (min 3 characters)');
+      }
+    }
   }
 
   @override
   void dispose() {
     _phoneController.dispose();
     _usernameController.dispose();
+    _otpController.dispose();
+    _otpFocusNode.dispose();
     super.dispose();
   }
-
 
   List<DropdownMenuItem<String>> _buildRoleDropdownItems() {
     final Map<String, IconData> roleIcons = {
@@ -57,27 +98,123 @@ class _LoginScreenState extends State<LoginScreen> {
     };
 
     return roleIcons.entries.map((entry) {
+      final isSelected = entry.key == selectedRole;
       return DropdownMenuItem(
         value: entry.key,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              entry.value,
-              size: 20,
-              color: ColorClass.iconStrong900,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              entry.key,
-              style: TextStyle(
-                color: ColorClass.black,
-                fontWeight: FontWeight.w500,
-              ),
+            Row(
+              children: [
+                Icon(
+                  entry.value,
+                  size: 20,
+                  color: ColorClass.iconStrong900,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  entry.key,
+                  style: TextStyle(
+                    color: ColorClass.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       );
     }).toList();
+  }
+
+  Widget _buildOtpField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        const Text(
+          'Enter OTP',
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: ColorClass.white),
+        ),
+        const SizedBox(height: 8),
+        Pinput(
+          length: 6,
+          controller: _otpController,
+          focusNode: _otpFocusNode,
+          defaultPinTheme: PinTheme(
+            width: 56,
+            height: 56,
+            textStyle: const TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          showCursor: true,
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerRight,
+          child:TextButton(
+            onPressed: (){
+              _resendOtp();
+            },
+            child: Text(
+              'Resend OTP',
+              style: TextStyle(color: ColorClass.brandLightGreen),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneOrUsernameField() {
+    if (_isUserRole && isPhoneEntered) {
+      return _buildOtpField();
+    }
+    return TextFormField(
+      controller: _isUserRole ? _phoneController : _usernameController,
+      keyboardType: _isUserRole ? TextInputType.phone : TextInputType.text,
+      style: const TextStyle(color: Colors.black),
+      validator: (value) {
+        if (_isUserRole) {
+          return isValidPhoneNumber(value) ? null : 'Enter valid 10-digit phone number';
+        } else {
+          return isValidUsername(value) ? null : 'Username must be at least 3 characters';
+        }
+      },
+      decoration: InputDecoration(
+        hintText: _isUserRole ? 'Phone Number' : 'Username',
+        hintStyle: const TextStyle(color: Colors.grey),
+        prefixIcon: Icon(
+          _isUserRole ? LucideIcons.smartphone : LucideIcons.user,
+          color: ColorClass.black,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: ColorClass.brandLightGreen,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: ColorClass.brandLightGreen, // Same or different color
+            width: 2, // Thicker for focus
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -128,75 +265,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Column(
                       children: [
-                        DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          icon: Icon(
-                            LucideIcons.chevronDown,
-                            color: ColorClass.black,
-                          ),
-                          value: selectedRole,
-                          items: _buildRoleDropdownItems(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedRole = value;
-                              isPhoneEntered = false;
-                            });
-                          },
-                        ),
-
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: selectedRole == 'User' ? _phoneController : _usernameController,
-                          keyboardType: selectedRole == 'User' ? TextInputType.phone : TextInputType.text,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            hintText: selectedRole == 'User' ? 'Phone Number' : 'Username',
-                            hintStyle: const TextStyle(color: Colors.grey),
-                            prefixIcon: Icon(
-                              selectedRole == 'User' ? LucideIcons.smartphone : LucideIcons.user,
+                        if (!isPhoneEntered)
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            icon: Icon(
+                              LucideIcons.chevronDown,
                               color: ColorClass.black,
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide.none,
-                            ),
+                            value: selectedRole,
+                            items: _buildRoleDropdownItems(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRole = value;
+                                isPhoneEntered = false;
+                              });
+                            },
                           ),
-                        ),
+
+                        const SizedBox(height: 20),
+                        _buildPhoneOrUsernameField(),
                         const SizedBox(height: 32),
                         ElevatedButton(
-                          onPressed: () {
-                            if (selectedRole == 'User') {
-                              if (isValidPhoneNumber(_phoneController.text)) {
-                                navigateReplaceTo(context: context, route: RouteNames.home);
-                              } else {
-                                toastification.show(
-                                  context: context,
-                                  title: Text('Error'),
-                                  description: Text('Please enter a valid 10-digit phone number'),
-                                  type: ToastificationType.error,
-                                  autoCloseDuration: Duration(seconds: 3),
-                                );
-                              }
-                            } else {
-                              if (isValidUsername(_usernameController.text)) {
-                                navigateReplaceTo(context: context, route: RouteNames.home);
-                              } else {
-                                toastification.show(
-                                  context: context,
-                                  title: Text('Error'),
-                                  description: Text('Please enter a valid username (min 3 characters)'),
-                                  type: ToastificationType.error,
-                                  autoCloseDuration: Duration(seconds: 3),
-                                );
-                              }
-                            }
-                          },
+                          onPressed:  _handleContinue,
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 50),
                             backgroundColor: ColorClass.brandLightGreen,
@@ -205,7 +299,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: Text('Continue', style: TextStyle(color: ColorClass.black.withValues(alpha: 0.8), fontSize: 16, fontWeight: FontWeight.bold)),
+                          child: Text(
+                            isPhoneEntered ? 'Validate' : 'Continue',
+                            style: TextStyle(
+                              color: ColorClass.black.withValues(alpha: 0.8),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 24),
                         TextButton(
