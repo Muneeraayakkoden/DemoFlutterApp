@@ -98,7 +98,6 @@ class _LoginScreenState extends State<LoginScreen> {
     };
 
     return roleIcons.entries.map((entry) {
-      final isSelected = entry.key == selectedRole;
       return DropdownMenuItem(
         value: entry.key,
         child: Row(
