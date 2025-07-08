@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../constants/color_class.dart';
-import '../../constants/textstyle_class.dart';
+import '../../../constants/color_class.dart';
+import '../../../constants/textstyle_class.dart';
 
 class UserNotification extends StatefulWidget {
  const UserNotification({super.key});

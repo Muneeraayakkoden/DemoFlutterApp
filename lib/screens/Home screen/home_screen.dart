@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 // import 'package:lucide_icons/lucide_icons.dart';
-import 'bottom_navbar.dart'; 
+import 'bottom navbar/bottom_navbar.dart'; 
 import 'user_screens/user_home.dart';
 import 'user_screens/user_notifcation.dart';
-import 'profile.dart';
+import '../Profile screen/profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

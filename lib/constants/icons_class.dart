@@ -4,4 +4,5 @@ class IconClass {
   static const String splashImage = '${iconRoot}splashImage.png';
   static const String splashLogo = '${iconRoot}splashLogo.png';
   static const String dxLogoWhite = '${iconRoot}dxLogoWhite.png';
+  static const String d4dxLogo = '${iconRoot}d4dx_logo.png';
 }

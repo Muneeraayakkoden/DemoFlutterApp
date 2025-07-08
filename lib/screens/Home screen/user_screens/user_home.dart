@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import '../../constants/color_class.dart';
-import '../../constants/textstyle_class.dart';
+import '../../../../../constants/color_class.dart';
+import '../../../../../constants/textstyle_class.dart';
 
-class ProfileScreen extends StatefulWidget {
- const ProfileScreen({super.key});
+class UserHome extends StatefulWidget {
+ const UserHome({super.key});
 
   @override
-  State<ProfileScreen> createState() => ProfileScreenState();
+  State<UserHome> createState() => UserHomeState();
 }
 
-class ProfileScreenState extends State<ProfileScreen> {
+class UserHomeState extends State<UserHome> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ColorClass.greenDarker,
-        title: Text('Profile',      
+        title: Text('Hira +',
         style: TextStyleClass.primaryFont500(20, ColorClass.white),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Text('Profile Screen'),
+            Text('User Home Page.'),
           ],
         ),
       ),

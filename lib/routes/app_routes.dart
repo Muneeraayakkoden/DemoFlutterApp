@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/home_screen.dart';
-import 'package:flutter_application_1/screens/splash_screen.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
+import 'package:flutter_application_1/screens/Home%20screen/home_screen.dart';
+import 'package:flutter_application_1/screens/Splash%20screen/splash_screen.dart';
+import 'package:flutter_application_1/screens/Login%20screen/login_screen.dart';
 import 'routes_names.dart';
 
 class AppRoutes {
