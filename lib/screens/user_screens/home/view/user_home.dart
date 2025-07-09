@@ -28,19 +28,19 @@ class UserHomeState extends State<UserHome> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 1. Advertisement Banner
+            // Advertisement Banner
             Advertisement(),
             const SizedBox(height: 10),
-            // 2. Meal Count Card
+            // Meal Card
             MealCard(),
             const SizedBox(height: 16),
-            // 3. Mark Meal Widget
+            // Mark Meal
             MealService(),
             const SizedBox(height: 16),
-            // 4. Meetings Widget (Enhanced with edit/delete)
+            // Meetings
             MeetingService(),
             const SizedBox(height: 16),
-            // 5. All Users Widget
+            // All Users
             ContactService(),
             const SizedBox(height: 24),
           ],
