@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../constants/color_class.dart';
 import '../../../constants/textstyle_class.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../../constants/icons_class.dart';
-import '../../../constants/global_variables.dart';
+import 'Item_card.dart';
+import 'powered_by.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,7 +27,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            ProfileCard(),
+            ProfileCard(userName:'', phone:'', designation:''),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -80,9 +80,52 @@ class ProfileScreenState extends State<ProfileScreen> {
 
 //Profile Card
 class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key});
+  final String userName;
+  final String phone;
+  final String designation;
+
+  const ProfileCard({super.key, 
+    required this.userName,
+    required this.phone,
+    required this.designation,
+  });
+
+  bool get isEmptyData =>
+    userName.trim().isEmpty &&
+    phone.trim().isEmpty &&
+    designation.trim().isEmpty;
+
   @override
   Widget build(BuildContext context) {
+    if (isEmptyData) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: ColorClass.greenDarker,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: ColorClass.brandLightGreen,
+              child: Icon(LucideIcons.user, color: ColorClass.greenDarker, size: 30),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children:[
+                  Text('No data available',
+                  style: TextStyleClass.primaryFont500(16, ColorClass.white)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -95,83 +138,21 @@ class ProfileCard extends StatelessWidget {
           CircleAvatar(
             radius: 30,
             backgroundColor: ColorClass.brandLightGreen,
-            child: Icon(LucideIcons.user, color: ColorClass.greenDarker, size: 30),
+            child: Text(userName[0].toUpperCase()),
           ),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'User',
-                  style: TextStyleClass.primaryFont500(20, ColorClass.white),
-                ),
+                Text('Name: $userName'),
+                Text('Phone: $phone'),
+                Text('Designation: $designation'),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-//ItemList
-class ItemCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool isDestructive;
-
-  const ItemCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, color: isDestructive ? Colors.red : Colors.black),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isDestructive ? Colors.red : Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-//powered by
-class PoweredBy extends StatelessWidget {
-  const PoweredBy({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          'Powered by',
-          style: TextStyleClass.poppinsMedium(
-            fontSize: 14,
-            color: ColorClass.neutral400,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Image.asset(IconClass.d4dxLogo, height: 60),
-        const SizedBox(height: 8),
-        Text(
-          'v${GlobalVariables.appVersion}',
-          style: TextStyleClass.poppinsRegular(
-            fontSize: 12,
-            color: ColorClass.neutral400,
-          ),
-        ),
-      ],
     );
   }
 }
