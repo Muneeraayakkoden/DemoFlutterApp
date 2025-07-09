@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../constants/color_class.dart';
-import '../../../constants/global_variables.dart';
-import '../../../constants/icons_class.dart';
-import '../../../constants/textstyle_class.dart';
+import '../../../../constants/color_class.dart';
+import '../../../../constants/global_variables.dart';
+import '../../../../constants/icons_class.dart';
+import '../../../../constants/textstyle_class.dart';
 
 //powered by
 class PoweredBy extends StatelessWidget {

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../constants/color_class.dart';
+import '../../../../constants/color_class.dart';
 
 //ItemList
-class ItemCard extends StatelessWidget {
+class ItemList extends StatelessWidget {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
   final bool isDestructive;
 
-  const ItemCard({
+  const ItemList({
     super.key,
     required this.title,
     required this.icon,
