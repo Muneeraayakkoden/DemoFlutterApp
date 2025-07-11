@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../constants/color_class.dart';
 
-class MealCard extends StatelessWidget {
-  const MealCard({super.key});
+class MealBox extends StatelessWidget {
+  const MealBox({super.key});
   @override
   Widget build(BuildContext context) {
     final mealCounts = {

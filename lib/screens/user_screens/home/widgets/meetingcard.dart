@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../widgets/action_cards.dart';
+import 'action_cards.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class MeetingService extends StatelessWidget {
-  const MeetingService({super.key});
+class Meetingcard extends StatelessWidget {
+  const Meetingcard({super.key});
 
   @override
   Widget build(BuildContext context) {

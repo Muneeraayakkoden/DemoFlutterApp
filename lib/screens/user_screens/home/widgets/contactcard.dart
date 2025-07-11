@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/action_cards.dart';
+import 'action_cards.dart';
 
-class ContactService extends StatelessWidget {
-  const ContactService({super.key});
+class Contactcard extends StatelessWidget {
+  const Contactcard({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/action_cards.dart';
+import 'action_cards.dart';
 
-class MealService extends StatelessWidget {
-  const MealService({super.key});
+class Mealscard extends StatelessWidget {
+  const Mealscard({super.key});
 
   @override
   Widget build(BuildContext context) {

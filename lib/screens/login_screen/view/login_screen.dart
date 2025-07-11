@@ -1,93 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../constants/icons_class.dart';
 import '../../../constants/color_class.dart';
-import '../../../routes/routes_names.dart';
-import '../../../utils/navigation_helper.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:toastification/toastification.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
+import '../provider/login_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  String? selectedRole = 'User';
-  bool isPhoneEntered = false;
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _otpController = TextEditingController();
-  final FocusNode _otpFocusNode = FocusNode();
-  bool get _isUserRole => selectedRole == 'User';
-
-  bool isValidPhoneNumber(String? value) {
-    if (value == null || value.isEmpty) return false;
-    return RegExp(r'^[0-9]{10}$').hasMatch(value);
-  }
-  bool isValidUsername(String? value) {
-    return value != null && value.isNotEmpty && value.length >= 3; 
-  }
-
-  void _showError(String message) {
-    toastification.show(
-      context: context,
-      title: const Text('Error'),
-      description: Text(message),
-      type: ToastificationType.error,
-      autoCloseDuration: const Duration(seconds: 3),
-    );
-  }
-    void _showSuccess(String message) {
-    toastification.show(
-      context: context,
-      title: const Text('Success'),
-      description: Text(message),
-      type: ToastificationType.success,
-      autoCloseDuration: const Duration(seconds: 3),
-    );
-  }
-
-  void _resendOtp() {
-    // OTP resend logic
-    _showSuccess('OTP resent to ${_phoneController.text}');
-  }
-
-  void _handleContinue() {
-    if (_isUserRole) {
-      if (isPhoneEntered) {
-        // OTP validation logic would go here
-        if(_otpController.text.length == 6){
-          _showSuccess('OTP validated');
-          navigateReplaceTo(context: context, route: RouteNames.home);
-        } else {
-          _showError('Please enter a valid OTP');
-        }
-      } else if (isValidPhoneNumber(_phoneController.text)) {
-        setState(() => isPhoneEntered = true);
-        _otpFocusNode.requestFocus();
-      } else {
-        _showError('Please enter a valid 10-digit phone number');
-      }
-    } else {
-      if (isValidUsername(_usernameController.text)) {
-        navigateReplaceTo(context: context, route: RouteNames.home);
-      } else {
-        _showError('Please enter a valid username (min 3 characters)');
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _usernameController.dispose();
-    _otpController.dispose();
-    _otpFocusNode.dispose();
-    super.dispose();
-  }
 
   List<DropdownMenuItem<String>> _buildRoleDropdownItems() {
     final Map<String, IconData> roleIcons = {
@@ -105,11 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  entry.value,
-                  size: 20,
-                  color: ColorClass.iconStrong900,
-                ),
+                Icon(entry.value, size: 20, color: ColorClass.iconStrong900),
                 const SizedBox(width: 12),
                 Text(
                   entry.key,
@@ -126,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }).toList();
   }
 
-  Widget _buildOtpField() {
+  Widget _buildOtpField(BuildContext context, LoginProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,15 +50,16 @@ class _LoginScreenState extends State<LoginScreen> {
         const Text(
           'Enter OTP',
           style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: ColorClass.white),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: ColorClass.white,
+          ),
         ),
         const SizedBox(height: 8),
         Pinput(
           length: 6,
-          controller: _otpController,
-          focusNode: _otpFocusNode,
+          controller: provider.otpController,
+          focusNode: provider.otpFocusNode,
           defaultPinTheme: PinTheme(
             width: 56,
             height: 56,
@@ -161,9 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerRight,
-          child:TextButton(
-            onPressed: (){
-              _resendOtp();
+          child: TextButton(
+            onPressed: () {
+              context.read<LoginProvider>().resendOtp(context);
             },
             child: Text(
               'Resend OTP',
@@ -175,40 +92,48 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPhoneOrUsernameField() {
-    if (_isUserRole && isPhoneEntered) {
-      return _buildOtpField();
+  Widget _buildPhoneOrUsernameField(
+    BuildContext context,
+    LoginProvider provider,
+  ) {
+    if (provider.isUserRole && provider.isPhoneEntered) {
+      return _buildOtpField(context, provider);
     }
     return TextFormField(
-      controller: _isUserRole ? _phoneController : _usernameController,
-      keyboardType: _isUserRole ? TextInputType.phone : TextInputType.text,
+      controller:
+          provider.isUserRole
+              ? provider.phoneController
+              : provider.usernameController,
+      focusNode: provider.isUserRole ? provider.phoneFocusNode : null,
+      keyboardType:
+          provider.isUserRole ? TextInputType.phone : TextInputType.text,
       style: const TextStyle(color: Colors.black),
       validator: (value) {
-        if (_isUserRole) {
-          return isValidPhoneNumber(value) ? null : 'Enter valid 10-digit phone number';
-        } else {
-          return isValidUsername(value) ? null : 'Username must be at least 3 characters';
+        return provider.getFieldValidationMessage(value);
+      },
+      onFieldSubmitted: (_) {
+        final form = Form.of(context);
+        if (form.validate()) {
+          provider.handleContinue(context);
         }
       },
       decoration: InputDecoration(
-        hintText: _isUserRole ? 'Phone Number' : 'Username',
+        hintText: provider.isUserRole ? 'Phone Number' : 'Username',
         hintStyle: const TextStyle(color: Colors.grey),
         prefixIcon: Icon(
-          _isUserRole ? LucideIcons.smartphone : LucideIcons.user,
+          provider.isUserRole ? LucideIcons.smartphone : LucideIcons.user,
           color: ColorClass.black,
         ),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: ColorClass.brandLightGreen,
-          ),
+          borderSide: BorderSide(color: ColorClass.brandLightGreen),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: ColorClass.brandLightGreen, // Same or different color
+            color: ColorClass.brandLightGreen,
             width: 2, // Thicker for focus
           ),
         ),
@@ -218,6 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LoginProvider>(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -226,8 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
             end: Alignment.bottomCenter,
             colors: [
               ColorClass.brandDarkGreen, // top
-              ColorClass.middleGradient, 
-              ColorClass.bottomGradient,// bottom
+              ColorClass.middleGradient,
+              ColorClass.bottomGradient, // bottom
             ],
           ),
         ),
@@ -239,12 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  const SizedBox(height:190),
-                  Image.asset(
-                    IconClass.splashLogo,
-                    width: 58,
-                    height: 58,
-                  ),
+                  const SizedBox(height: 190),
+                  Image.asset(IconClass.splashLogo, width: 58, height: 58),
                   const SizedBox(height: 32),
                   Text(
                     'Hira Plus',
@@ -257,17 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 12),
                   Text(
                     'Hira Automation System',
-                    style: TextStyle(fontSize: 16, color: ColorClass.brandLightGreen.withValues(alpha: 1)),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: ColorClass.brandLightGreen.withValues(alpha: 1),
+                    ),
                   ),
                   const SizedBox(height: 48),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Column(
                       children: [
-                        if (!isPhoneEntered)
+                        if (!provider.isPhoneEntered)
                           DropdownButtonFormField<String>(
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
+                              ),
                               filled: true,
                               fillColor: Colors.white,
                             ),
@@ -275,21 +203,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               LucideIcons.chevronDown,
                               color: ColorClass.black,
                             ),
-                            value: selectedRole,
+                            value: provider.selectedRole,
                             items: _buildRoleDropdownItems(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedRole = value;
-                                isPhoneEntered = false;
-                              });
-                            },
+                            onChanged:
+                                provider.isPhoneEntered
+                                    ? null
+                                    : (value) => provider.setRole(value),
                           ),
 
                         const SizedBox(height: 20),
-                        _buildPhoneOrUsernameField(),
+                        _buildPhoneOrUsernameField(context, provider),
                         const SizedBox(height: 32),
                         ElevatedButton(
-                          onPressed:  _handleContinue,
+                          onPressed:
+                              provider.isLoading
+                                  ? null
+                                  : () {
+                                    provider.handleContinue(context);
+                                  },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 50),
                             backgroundColor: ColorClass.brandLightGreen,
@@ -298,14 +229,30 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: Text(
-                            isPhoneEntered ? 'Validate' : 'Continue',
-                            style: TextStyle(
-                              color: ColorClass.black.withValues(alpha: 0.8),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child:
+                              provider.isLoading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black,
+                                      ),
+                                    ),
+                                  )
+                                  : Text(
+                                    provider.isPhoneEntered
+                                        ? 'Validate'
+                                        : 'Continue',
+                                    style: TextStyle(
+                                      color: ColorClass.black.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                         ),
                         const SizedBox(height: 24),
                         TextButton(
@@ -313,9 +260,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             // help
                           },
                           style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                            backgroundColor: ColorClass.brandLightGreen.withValues(alpha: 0.1), 
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 2,
+                            ),
+                            backgroundColor: ColorClass.brandLightGreen
+                                .withValues(alpha: 0.1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -329,7 +282,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(width: 10),
                               Text(
                                 'Need help? Contact Hira Manager',
-                                style: TextStyle(color: ColorClass.brandLightGreen.withValues(alpha: 1), fontSize: 12),
+                                style: TextStyle(
+                                  color: ColorClass.brandLightGreen.withValues(
+                                    alpha: 1,
+                                  ),
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
