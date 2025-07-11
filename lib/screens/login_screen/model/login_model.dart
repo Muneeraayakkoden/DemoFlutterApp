@@ -6,10 +6,21 @@ class LoginRequest {
   LoginRequest({required this.phone, this.username, required this.role});
 
   Map<String, dynamic> toJson() => {
-    'role': role,
-    'phone': phone,
-    'username': username,
-  };
+        'role': role,
+        'phone': phone,
+        'username': username,
+      };
+}
+
+// New class specifically for OTP request
+class OtpRequest {
+  final int phoneNumber;
+
+  OtpRequest({required this.phoneNumber});
+
+  Map<String, dynamic> toJson() => {
+        'phoneNumber': phoneNumber,
+      };
 }
 
 class LoginResponse {

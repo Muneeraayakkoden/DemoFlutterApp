@@ -8,20 +8,16 @@ import '../../../constants/api_urls.dart';
 class LoginService {
   final Duration _timeout = const Duration(seconds: 60);
 
-  Future<LoginResponse> sendOtp(LoginRequest request) async {
+  Future<LoginResponse> sendOtp(String phone) async {
     try {
       final url = Uri.parse(ApiUrls.getRequestOtp());
       print('API URL: ${url.toString()}');
 
-      final formattedRequest = LoginRequest(
-        phone: request.phone,
-        role: request.role,
-        username: request.username,
-      );
+      // Create OTP request with phoneNumber as integer
+      final otpRequest = OtpRequest(phoneNumber: int.parse(phone));
+      final requestJson = otpRequest.toJson();
 
-      final requestJson = formattedRequest.toJson();
-      // Convert phone to number instead of string to avoid quote issues
-      requestJson['phone'] = int.parse(request.phone);
+      print('Request body: ${jsonEncode(requestJson)}'); // Debug log
 
       final response = await http
           .post(

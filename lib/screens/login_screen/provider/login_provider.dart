@@ -49,13 +49,8 @@ class LoginProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final request = LoginRequest(
-        phone: phone,
-        role: selectedRole,
-        username: !isUserRole ? usernameController.text.trim() : null,
-      );
-
-      final response = await _loginService.sendOtp(request);
+      // Simply send the phone number to the service
+      final response = await _loginService.sendOtp(phone);
       if (response.success) {
         isPhoneEntered = true;
         notifyListeners();
