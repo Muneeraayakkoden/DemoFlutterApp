@@ -4,7 +4,7 @@ import '../../../constants/color_class.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
-import '../provider/login_provider.dart';
+import '../provider/auth_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -42,18 +42,23 @@ class LoginScreen extends StatelessWidget {
     }).toList();
   }
 
-  Widget _buildOtpField(BuildContext context, LoginProvider provider) {
+  Widget _buildOtpField(BuildContext context, AuthProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        const Text(
-          'Enter OTP',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: ColorClass.white,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Enter OTP',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: ColorClass.white,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Pinput(
@@ -69,24 +74,70 @@ class LoginScreen extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: ColorClass.brandLightGreen.withValues(alpha: 0.5),
+              ),
             ),
           ),
+          focusedPinTheme: PinTheme(
+            width: 56,
+            height: 56,
+            textStyle: const TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: ColorClass.brandLightGreen, width: 2),
+            ),
+          ),
+          errorPinTheme: PinTheme(
+            width: 56,
+            height: 56,
+            textStyle: const TextStyle(
+              fontSize: 20,
+              color: Colors.red,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.red, width: 2),
+            ),
+          ),
+          onCompleted: (pin) {
+            // Auto-submit when OTP is complete
+            if (pin.length == 6) {
+              provider.handleContinue(context);
+            }
+          },
           showCursor: true,
         ),
         const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: () {
-              context.read<LoginProvider>().resendOtp(context);
-            },
-            child: Text(
-              'Resend OTP',
-              style: TextStyle(color: ColorClass.brandLightGreen),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+              onPressed:
+                  provider.isLoading ? null : () => provider.resendOtp(context),
+              icon: Icon(
+                LucideIcons.refreshCw,
+                size: 16,
+                color: ColorClass.brandLightGreen,
+              ),
+              label: Text(
+                'Resend OTP',
+                style: TextStyle(
+                  color: ColorClass.brandLightGreen,
+                  fontSize: 14,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -94,7 +145,7 @@ class LoginScreen extends StatelessWidget {
 
   Widget _buildPhoneOrUsernameField(
     BuildContext context,
-    LoginProvider provider,
+    AuthProvider provider,
   ) {
     if (provider.isUserRole && provider.isPhoneEntered) {
       return _buildOtpField(context, provider);
@@ -132,10 +183,15 @@ class LoginScreen extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: ColorClass.brandLightGreen,
-            width: 2, // Thicker for focus
-          ),
+          borderSide: BorderSide(color: ColorClass.brandLightGreen, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
       ),
     );
@@ -143,7 +199,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<LoginProvider>(context);
+    final provider = Provider.of<AuthProvider>(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -151,9 +207,9 @@ class LoginScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              ColorClass.brandDarkGreen, // top
+              ColorClass.brandDarkGreen,
               ColorClass.middleGradient,
-              ColorClass.bottomGradient, // bottom
+              ColorClass.bottomGradient,
             ],
           ),
         ),
@@ -173,7 +229,7 @@ class LoginScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: ColorClass.brandLightGreen.withValues(alpha: 1),
+                      color: ColorClass.brandLightGreen,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -181,118 +237,116 @@ class LoginScreen extends StatelessWidget {
                     'Hira Automation System',
                     style: TextStyle(
                       fontSize: 16,
-                      color: ColorClass.brandLightGreen.withValues(alpha: 1),
+                      color: ColorClass.brandLightGreen,
                     ),
                   ),
                   const SizedBox(height: 48),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Column(
-                      children: [
-                        if (!provider.isPhoneEntered)
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                            icon: Icon(
-                              LucideIcons.chevronDown,
-                              color: ColorClass.black,
-                            ),
-                            value: provider.selectedRole,
-                            items: _buildRoleDropdownItems(),
-                            onChanged:
-                                provider.isPhoneEntered
-                                    ? null
-                                    : (value) => provider.setRole(value),
-                          ),
-
-                        const SizedBox(height: 20),
-                        _buildPhoneOrUsernameField(context, provider),
-                        const SizedBox(height: 32),
-                        ElevatedButton(
-                          onPressed:
-                              provider.isLoading
-                                  ? null
-                                  : () {
-                                    provider.handleContinue(context);
-                                  },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 50),
-                            backgroundColor: ColorClass.brandLightGreen,
-                            foregroundColor: ColorClass.brandDarkGreen,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child:
-                              provider.isLoading
-                                  ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.black,
-                                      ),
-                                    ),
-                                  )
-                                  : Text(
-                                    provider.isPhoneEntered
-                                        ? 'Validate'
-                                        : 'Continue',
-                                    style: TextStyle(
-                                      color: ColorClass.black.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                        ),
-                        const SizedBox(height: 24),
-                        TextButton(
-                          onPressed: () {
-                            // help
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 2,
-                            ),
-                            backgroundColor: ColorClass.brandLightGreen
-                                .withValues(alpha: 0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                size: 16,
-                                color: ColorClass.brandLightGreen,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Need help? Contact Hira Manager',
-                                style: TextStyle(
-                                  color: ColorClass.brandLightGreen.withValues(
-                                    alpha: 1,
-                                  ),
-                                  fontSize: 12,
+                    child: Form(
+                      child: Column(
+                        children: [
+                          if (!provider.isPhoneEntered)
+                            DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
                                 ),
+                                filled: true,
+                                fillColor: Colors.white,
                               ),
-                            ],
+                              icon: Icon(
+                                LucideIcons.chevronDown,
+                                color: ColorClass.black,
+                              ),
+                              value: provider.selectedRole,
+                              items: _buildRoleDropdownItems(),
+                              onChanged:
+                                  provider.isPhoneEntered
+                                      ? null
+                                      : (value) => provider.setRole(value),
+                            ),
+                          const SizedBox(height: 20),
+                          _buildPhoneOrUsernameField(context, provider),
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed:
+                                provider.isLoading
+                                    ? null
+                                    : () => provider.handleContinue(context),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 50),
+                              backgroundColor: ColorClass.brandLightGreen,
+                              foregroundColor: ColorClass.brandDarkGreen,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child:
+                                provider.isLoading
+                                    ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.black,
+                                            ),
+                                      ),
+                                    )
+                                    : Text(
+                                      provider.isPhoneEntered
+                                          ? 'Verify OTP'
+                                          : 'Continue',
+                                      style: TextStyle(
+                                        color: ColorClass.black.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 24),
+                          TextButton(
+                            onPressed: () {
+                              // help
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 2,
+                              ),
+                              backgroundColor: ColorClass.brandLightGreen
+                                  .withValues(alpha: 0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 16,
+                                  color: ColorClass.brandLightGreen,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Need help? Contact Hira Manager',
+                                  style: TextStyle(
+                                    color: ColorClass.brandLightGreen,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),

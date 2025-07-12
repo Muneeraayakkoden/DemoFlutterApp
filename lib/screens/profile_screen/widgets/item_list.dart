@@ -30,6 +30,7 @@ class ItemList extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
+      onTap: onTap, // Add the onTap handler
     );
   }
 }

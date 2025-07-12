@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/routes/routes_names.dart';
 import 'package:flutter_application_1/constants/icons_class.dart';
 import 'package:flutter_application_1/constants/textstyle_class.dart';
 import 'package:flutter_application_1/constants/color_class.dart';
-import 'package:flutter_application_1/utils/navigation_helper.dart';
 import 'package:flutter_application_1/constants/global_variables.dart';
-import 'dart:async';
+import '../provider/splash_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,36 +21,36 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
+
     _scaleAnimation = TweenSequence([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.7).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.7,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 0.7, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 0.7,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_animationController);
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
-    _animationController.forward();  
-    Future.delayed(Duration(milliseconds: 4000), () {
-      if (mounted) {
-        navigateReplaceTo(context: context, route: RouteNames.login);
-      }
-    });
+    _animationController.forward();
+    checkAuthAndNavigate(context);
   }
+
+
 
   @override
   void dispose() {
@@ -69,9 +67,9 @@ class _SplashScreenState extends State<SplashScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              ColorClass.brandDarkGreen, // top
-              ColorClass.middleGradient, 
-              ColorClass.bottomGradient,// bottom
+              ColorClass.brandDarkGreen,
+              ColorClass.middleGradient,
+              ColorClass.bottomGradient,
             ],
           ),
         ),
@@ -80,7 +78,9 @@ class _SplashScreenState extends State<SplashScreen>
             Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.3),
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.3,
+                ),
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: SizedBox(
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Image.asset(
                       IconClass.splashImage,
                       width: MediaQuery.of(context).size.width,
-                      height:null,
+                      height: null,
                       fit: BoxFit.cover,
                     ),
                   );
@@ -122,12 +122,8 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                        IconClass.dxLogoWhite,
-                        width: 58,
-                        height: 58,
-                      ),
-                    SizedBox(height: 8),
+                    Image.asset(IconClass.dxLogoWhite, width: 58, height: 58),
+                    const SizedBox(height: 8),
                     Text(
                       'v${GlobalVariables.appVersion}',
                       style: TextStyleClass.poppinsRegular(
@@ -138,11 +134,10 @@ class _SplashScreenState extends State<SplashScreen>
                   ],
                 ),
               ),
-            ),  
+            ),
           ],
         ),
       ),
     );
   }
 }
-

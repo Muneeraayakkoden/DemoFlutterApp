@@ -6,18 +6,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 class ProfileBox extends StatelessWidget {
   final String userName;
   final String phone;
-  final String designation;
 
-  const ProfileBox({super.key, 
-    required this.userName,
-    required this.phone,
-    required this.designation,
-  });
+  const ProfileBox({super.key, required this.userName, required this.phone});
 
-  bool get isEmptyData =>
-    userName.trim().isEmpty &&
-    phone.trim().isEmpty &&
-    designation.trim().isEmpty;
+  bool get isEmptyData => userName.trim().isEmpty && phone.trim().isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -34,19 +26,24 @@ class ProfileBox extends StatelessWidget {
             CircleAvatar(
               radius: 30,
               backgroundColor: ColorClass.brandLightGreen,
-              child: Icon(LucideIcons.user, color: ColorClass.greenDarker, size: 30),
+              child: Icon(
+                LucideIcons.user,
+                color: ColorClass.greenDarker,
+                size: 30,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children:[
-                  Text('No data available',
+                children: [
+                  Text(
+                    'No data available',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white
-                    )
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -67,11 +64,13 @@ class ProfileBox extends StatelessWidget {
           CircleAvatar(
             radius: 30,
             backgroundColor: ColorClass.brandLightGreen,
-            child: Text(userName[0].toUpperCase(),
+            child: Text(
+              userName.isNotEmpty ? userName.trim().split(' ').where((e) => e.isNotEmpty).map((e) => e[0]).take(2).join().toUpperCase() : '',
               style: const TextStyle(
                 fontSize: 28,
                 color: ColorClass.brandDarkGreen,
-                fontWeight: FontWeight.bold)
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Padding(
@@ -79,9 +78,18 @@ class ProfileBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(userName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text(phone, style: const TextStyle(fontSize: 16, color: Colors.white70),),
-                Text(designation, style: const TextStyle(fontSize: 16, color: Colors.white70),),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  phone,
+                  style: const TextStyle(fontSize: 16, color: Colors.white70),
+                ),
               ],
             ),
           ),

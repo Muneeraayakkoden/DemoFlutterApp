@@ -11,13 +11,10 @@ class LoginService {
   Future<LoginResponse> sendOtp(String phone) async {
     try {
       final url = Uri.parse(ApiUrls.getRequestOtp());
-      print('API URL: ${url.toString()}');
 
       // Create OTP request with phoneNumber as integer
       final otpRequest = OtpRequest(phoneNumber: int.parse(phone));
       final requestJson = otpRequest.toJson();
-
-      print('Request body: ${jsonEncode(requestJson)}'); // Debug log
 
       final response = await http
           .post(
@@ -34,9 +31,6 @@ class LoginService {
               throw TimeoutException('Request timed out');
             },
           );
-
-      print('Response status code: ${response.statusCode}'); // Debug log
-      print('Response body: ${response.body}'); // Debug log
 
       final responseBody = jsonDecode(response.body);
 
@@ -71,10 +65,17 @@ class LoginService {
     try {
       final url = Uri.parse(ApiUrls.getVerifyOtp());
 
+      // Create OTP verification request with phoneNumber as integer
+      final verifyRequest = OtpVerificationRequest(
+        phoneNumber: int.parse(phone),
+        otp: otp,
+      );
+      final requestJson = verifyRequest.toJson();
+
       final response = await http
           .post(
             url,
-            body: jsonEncode({'phone': phone, 'otp': otp}),
+            body: jsonEncode(requestJson),
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
