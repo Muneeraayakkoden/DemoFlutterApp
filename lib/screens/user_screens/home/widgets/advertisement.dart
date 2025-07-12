@@ -18,21 +18,19 @@ class Advertisement extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                child: Text(
-                  'Latest updates \n available here!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: ColorClass.white,
-                  ), 
-                ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                'Latest updates \n available here!',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: ColorClass.white,
+                ), 
               ),
-            ],
+            ),
           ),
         ),
       );
