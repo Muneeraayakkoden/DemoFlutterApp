@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'action_cards.dart';
 import '../../../../constants/color_class.dart';
-import 'list_calender.dart';
+import 'list_calendar.dart';
+import 'month_calendar.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class Mealscard extends StatelessWidget {
@@ -72,11 +73,8 @@ class MarkMealsModalContent extends StatelessWidget {
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: const TabBarView(
-                  children: [
-                    ListCalender(),
-                    Center(child: Text('Calendar View Placeholder')),
-                  ],
+                child: TabBarView(
+                  children: [const ListCalender(), MonthCalendar()],
                 ),
               ),
             ],
