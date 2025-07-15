@@ -228,13 +228,16 @@ class _MealCheckbox extends StatelessWidget {
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('OK', style: TextStyle(color: ColorClass.black)),
+                                child: const Text(
+                                  'OK',
+                                  style: TextStyle(color: ColorClass.black),
+                                ),
                               ),
                             ],
                           ),
                     );
                   }
-                  : () => provider.toggleMeal(
+                  : () async => await provider.toggleMeal(
                     date,
                     meal,
                     onError: (msg) {
