@@ -334,7 +334,7 @@ class _MealCheckbox extends StatelessWidget {
             color:
                 expired
                     ? ColorClass.textSoft400
-                    : (checked ? ColorClass.textSoft400 : ColorClass.black),
+                    : (checked ? ColorClass.textSoft400 : ColorClass.neutral800),
             width: 1.2,
           ),
           borderRadius: BorderRadius.circular(3),
@@ -353,7 +353,7 @@ class _MealCheckbox extends StatelessWidget {
                     label,
                     style: TextStyleClass.primaryFont600(
                       size - 3,
-                      ColorClass.black,
+                      ColorClass.neutral900,
                     ),
                   ),
         ),
