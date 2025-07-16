@@ -41,7 +41,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
   }
 
   List<DateTime> _getMonthDays(DateTime month) {
-    final first = DateTime(month.year, month.month, 1);
     final last = DateTime(month.year, month.month + 1, 0);
     return [
       for (int i = 0; i < last.day; i++)
@@ -69,7 +68,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                   ),
                   Text(
                     monthLabel,
-                    style: TextStyleClass.primaryFont700(16, ColorClass.black),
+                    style: TextStyleClass.primaryFont700(18, ColorClass.black),
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios, size: 20),
@@ -78,6 +77,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                 ],
               ),
             ),
+            const SizedBox(height: 2),
             Expanded(
               child: _MonthGrid(
                 dates: dates,
@@ -111,42 +111,52 @@ class _MonthGrid extends StatelessWidget {
     final startWeekday =
         firstDay.weekday % 7; // Sunday=0, Monday=1, ..., Saturday=6
     final totalCells = dates.length + startWeekday;
-    const weekdayInitials = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const weekdayInitials = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(7, (i) {
-            return Expanded(
-              child: Center(
-                child: Text(
-                  weekdayInitials[i],
-                  style: TextStyleClass.primaryFont600(
-                    13,
-                    i == 0 ? ColorClass.redBase : ColorClass.black,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(7, (i) {
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    weekdayInitials[i],
+                    style: TextStyleClass.primaryFont600(
+                      15,
+                      i == 0 ? ColorClass.redBase : ColorClass.black,
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 10),
         Expanded(
-          child: GridView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: totalCells,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
-              childAspectRatio: 1,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: GridView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: totalCells,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                mainAxisSpacing: 7,
+                crossAxisSpacing: 3,
+                childAspectRatio: 0.65,
+              ),
+              itemBuilder: (context, index) {
+                if (index < startWeekday) return const SizedBox.shrink();
+                final date = dates[index - startWeekday];
+                final isToday = provider.normalizeDate(date) == today;
+                return _DayCell(
+                  date: date,
+                  provider: provider,
+                  isToday: isToday,
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              if (index < startWeekday) return const SizedBox.shrink();
-              final date = dates[index - startWeekday];
-              final isToday = provider.normalizeDate(date) == today;
-              return _DayCell(date: date, provider: provider, isToday: isToday);
-            },
           ),
         ),
       ],
@@ -177,7 +187,9 @@ class _DayCell extends StatelessWidget {
             builder:
                 (_) => AlertDialog(
                   title: const Text("Meal Marking Expired"),
-                  content: const Text("You can't mark meals for this date."),
+                  content: const Text(
+                    "You can't select/deselect meals for this.",
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -198,7 +210,6 @@ class _DayCell extends StatelessWidget {
         }
       },
       child: Container(
-        margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: isToday ? ColorClass.brandLightGreen : ColorClass.white,
           border: Border.all(
@@ -208,22 +219,26 @@ class _DayCell extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Center(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 8),
                   Text(
                     '${date.day}',
                     style: TextStyleClass.primaryFont700(
-                      14,
-                      date.weekday == DateTime.sunday
-                          ? ColorClass.redBase
-                          : ColorClass.black,
+                      16,
+                      allLocked
+                          ? ColorClass.silver
+                          : (date.weekday == DateTime.sunday
+                              ? ColorClass.redBase
+                              : ColorClass.black),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children:
                         MealType.values.map((mealType) {
                           return _MealCheckbox(
@@ -231,7 +246,7 @@ class _DayCell extends StatelessWidget {
                             meal: mealType,
                             label: mealType.name[0].toUpperCase(),
                             provider: provider,
-                            size: 13, // smaller size
+                            size: 10,
                           );
                         }).toList(),
                   ),
@@ -244,7 +259,7 @@ class _DayCell extends StatelessWidget {
                 right: 2,
                 child: Icon(
                   Icons.lock,
-                  size: 12,
+                  size: 10,
                   color: ColorClass.textSoft400,
                 ),
               ),
@@ -312,14 +327,14 @@ class _MealCheckbox extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        margin: const EdgeInsets.symmetric(horizontal: 1),
+        margin: const EdgeInsets.symmetric(horizontal: 0.5),
         decoration: BoxDecoration(
           color: checked ? ColorClass.brandLightGreen : ColorClass.white,
           border: Border.all(
             color:
                 expired
                     ? ColorClass.textSoft400
-                    : (checked ? ColorClass.brandLightGreen : ColorClass.black),
+                    : (checked ? ColorClass.textSoft400 : ColorClass.black),
             width: 1.2,
           ),
           borderRadius: BorderRadius.circular(3),
@@ -327,17 +342,17 @@ class _MealCheckbox extends StatelessWidget {
         child: Center(
           child:
               checked
-                  ? Icon(Icons.check, size: size - 3)
+                  ? Icon(Icons.check, size: size - 2)
                   : expired
                   ? Icon(
                     Icons.lock,
-                    size: size - 2,
+                    size: size - 3,
                     color: ColorClass.textSoft400,
                   )
                   : Text(
                     label,
                     style: TextStyleClass.primaryFont600(
-                      size - 2,
+                      size - 3,
                       ColorClass.black,
                     ),
                   ),
@@ -376,7 +391,7 @@ class _MealModalState extends State<_MealModal> {
       padding: EdgeInsets.only(
         left: 24,
         right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 14,
         top: 24,
       ),
       child: Column(
@@ -424,9 +439,7 @@ class _MealModalState extends State<_MealModal> {
                       await widget.provider.toggleMeal(widget.date, meal);
                     }
                   }
-                  if (mounted) {
-                    Navigator.pop(context);
-                  }
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorClass.brandLightGreen,

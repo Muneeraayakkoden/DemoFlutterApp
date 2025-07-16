@@ -209,4 +209,5 @@ class ColorClass {
 
   static const Color middleGradient = Color(0xFF2D5A4F);
   static const Color bottomGradient = Color(0xFF4A8F77);
+  static const Color silver = Color(0xFFC0C0C0); // Standard silver
 }

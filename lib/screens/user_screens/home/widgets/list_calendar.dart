@@ -223,7 +223,7 @@ class _MealCheckbox extends StatelessWidget {
                           (context) => AlertDialog(
                             title: const Text('Meal Marking expired'),
                             content: const Text(
-                              "You can't mark meal for past time.",
+                              "You can't select/deselect meal for past time.",
                             ),
                             actions: [
                               TextButton(
@@ -259,7 +259,7 @@ class _MealCheckbox extends StatelessWidget {
                     expired
                         ? ColorClass.textSoft400
                         : (checked
-                            ? ColorClass.brandLightGreen
+                            ? ColorClass.textSoft400
                             : ColorClass.black),
                 width: 2,
               ),
